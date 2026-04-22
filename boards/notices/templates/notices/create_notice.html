@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Create a new notice to the board {{ board.name }}:</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Publish notice</button>
+        </form>
+
+        <a href="{% url 'view_board' board.pk %}">Cancel</a>
+    </body>
+</html>

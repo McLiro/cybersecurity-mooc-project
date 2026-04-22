@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>{{ board.name }}</h1>
+
+        {% for notice in notices %}
+            <h2>{{ notice.title }}</h2>
+            <p>{{ notice.content }}</p>
+        {% empty %}
+            <h2>Noticeboard is empty.</h2>
+        {% endfor %}
+
+        <a href="{% url 'create_notice' board.pk %}">Publish a notice to this board</a><br><br>
+        <a href="{% url 'home' %}">Return home</a>
+    </body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Create a new board:</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <p>Private boards can only be accessed by whitelisted users.</p>
+            <button type="submit">Create board</button>
+        </form>
+
+        <a href="{% url 'home' %}">Cancel</a>
+    </body>
+</html>

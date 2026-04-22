@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Your boards:</h1>
+        {% for board in user_boards %}
+            <li>
+                <a href="{% url 'view_board' board.pk %}">{{ board.name }}</a>
+            </li>
+        {% empty %}
+            <p>You don't have any boards.</p>
+        {% endfor %}
+
+        <a href="{% url 'create_board' %}">Create a new board.</a>
+
+        <h1>Public boards:</h1>
+        {% for board in public_boards %}
+            <li>
+                <a href="{% url 'view_board' board.pk %}">{{ board.name }}</a>
+            </li>
+        {% empty %}
+            <p>No public boards found.</p>
+        {% endfor %}
+
+        <br><form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    </body>
+</html>
