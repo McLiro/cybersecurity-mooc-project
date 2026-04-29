@@ -2,6 +2,32 @@
 <html>
     <body>
         <h1>{{ board.name }}</h1>
+        {% if board.is_private and board.owner == user %}
+            <p>This board is private. Whitelist a new user?</p>
+            <p>Enter username: (case sensitive)</p>
+            <form method="post" action="{% url 'whitelist_user' board.pk %}">
+            {% csrf_token %}
+            <input type="text" name="username" placeholder="username">
+            <button type="submit">Whitelist</button>
+            </form>
+
+            <p>To turn this board public, type 'public' below:</p>
+            <form method="post" action="{% url 'turn_public' board.pk %}">
+            {% csrf_token %}
+            <input type="text" name="verification" placeholder="public">
+            <button type="submit">Submit</button>
+            </form>
+        {% endif %}
+
+        {% if not board.is_private %}
+            <p>This board is public.</p>
+            <p>To turn this board private, type 'private' below:</p>
+            <form method="post" action="{% url 'turn_private' board.pk %}">
+            {% csrf_token %}
+            <input type="text" name="verification" placeholder="private">
+            <button type="submit">Submit</button>
+            </form>
+        {% endif %}
 
         {% for notice in notices %}
             <h2>{{ notice.title }}</h2>

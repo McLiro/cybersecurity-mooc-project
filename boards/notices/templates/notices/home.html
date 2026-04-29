@@ -4,7 +4,9 @@
         <h1>Your boards:</h1>
         {% for board in user_boards %}
             <li>
-                <a href="{% url 'view_board' board.pk %}">{{ board.name }}</a>
+                <a href="{% url 'view_board' board.pk %}">
+                    {{ board.name }}{% if board.is_private %} (private){% endif %}
+                </a>
             </li>
         {% empty %}
             <p>You don't have any boards.</p>
@@ -12,13 +14,15 @@
 
         <a href="{% url 'create_board' %}">Create a new board.</a>
 
-        <h1>Public boards:</h1>
-        {% for board in public_boards %}
+        <h1>Open boards:</h1>
+        {% for board in open_boards %}
             <li>
-                <a href="{% url 'view_board' board.pk %}">{{ board.name }}</a>
+                <a href="{% url 'view_board' board.pk %}">
+                    {{ board.name }}{% if board.is_private %} (private){% endif %}
+                </a>
             </li>
         {% empty %}
-            <p>No public boards found.</p>
+            <p>No open boards found.</p>
         {% endfor %}
 
         <br><form action="{% url 'logout' %}" method="post">

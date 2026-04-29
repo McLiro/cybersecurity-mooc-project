@@ -31,5 +31,8 @@ urlpatterns = [
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('create_board.html', notices_views.create_board, name='create_board'),
     path('view_board/<int:pk>/', notices_views.view_board, name='view_board'),
-    path('view_board/<int:pk>/create_notice.html', notices_views.create_notice, name='create_notice')
+    path('view_board/<int:pk>/create_notice.html', notices_views.create_notice, name='create_notice'),
+    path('view_board/<int:pk>/whitelist/', notices_views.whitelist_user, name='whitelist_user'),
+    path('view_board/<int:pk>/public/', notices_views.turn_public, name='turn_public'),
+    path('view_board/<int:pk>/private/', notices_views.turn_private, name='turn_private')
 ]

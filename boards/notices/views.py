@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from django.contrib.auth import login as auth_login
+from django.db.models import Q
 from .models import Board
 from .forms import BoardForm, NoticeForm
 
@@ -21,12 +23,16 @@ def register(request):
 
 @login_required
 def home(request):
-    """Home page showing user's boards and public boards."""
+    """Home page showing user's boards and open boards."""
     user_boards = Board.objects.filter(owner=request.user)
-    public_boards = Board.objects.filter(is_private=False).exclude(owner=request.user)
+    open_boards = Board.objects.filter(
+        Q(is_private=False) & ~Q(owner=request.user)
+        |
+        Q(is_private=True, users=request.user)
+    )
     context = {
         'user_boards': user_boards,
-        'public_boards': public_boards,
+        'open_boards': open_boards,
     }
     return render(request, 'notices/home.html', context)
 
@@ -69,3 +75,39 @@ def create_notice(request, pk):
     else:
         form = NoticeForm()
     return render(request, 'notices/create_notice.html', {'form': form, 'board': board})
+
+@login_required
+def whitelist_user(request, pk):
+    """Handles the whitelisting of new users."""
+    board = get_object_or_404(Board, pk=pk)
+
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        user = get_object_or_404(User, username=username)
+        board.users.add(user)
+
+    return render(request, 'notices/view_board.html', {'board': board})
+
+@login_required
+def turn_public(request, pk):
+    """Turns a private board into a public one."""
+    board = get_object_or_404(Board, pk=pk)
+
+    if request.method == 'POST':
+        if request.POST.get('verification') == 'public':
+            board.is_private = False
+            board.save()
+
+    return render(request, 'notices/view_board.html', {'board': board})
+
+@login_required
+def turn_private(request, pk):
+    """Turns a public board into a private one."""
+    board = get_object_or_404(Board, pk=pk)
+
+    if request.method == 'POST':
+        if request.POST.get('verification') == 'private':
+            board.is_private = True
+            board.save()
+
+    return render(request, 'notices/view_board.html', {'board': board})
