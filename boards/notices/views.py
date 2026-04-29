@@ -6,6 +6,7 @@ from django.contrib.auth import login as auth_login
 from django.db.models import Q
 from .models import Board
 from .forms import BoardForm, NoticeForm
+from .decorators import require_authorization, require_ownership
 
 def login(request):
     return render(request, 'accounts/login.html')
@@ -51,20 +52,16 @@ def create_board(request):
     return render(request, 'notices/create_board.html', {'form': form})
 
 @login_required
-def view_board(request, pk):
+@require_authorization
+def view_board(request, board):
     """Detailed view for a single board and its notices."""
-    board = get_object_or_404(Board, pk=pk)
-    if board.is_private:
-        if board.owner != request.user and request.user not in board.users.all():
-            return redirect('home')
     notices = board.notices.all()
     return render(request, 'notices/view_board.html', {'board': board, 'notices': notices})
 
 @login_required
-def create_notice(request, pk):
+@require_authorization
+def create_notice(request, board):
     """Page for creating new notices."""
-    board = get_object_or_404(Board, pk=pk)
-
     if request.method == 'POST':
         form = NoticeForm(request.POST)
         if form.is_valid():
@@ -77,37 +74,34 @@ def create_notice(request, pk):
     return render(request, 'notices/create_notice.html', {'form': form, 'board': board})
 
 @login_required
-def whitelist_user(request, pk):
+@require_ownership
+def whitelist_user(request, board):
     """Handles the whitelisting of new users."""
-    board = get_object_or_404(Board, pk=pk)
-
     if request.method == 'POST':
         username = request.POST.get('username')
         user = get_object_or_404(User, username=username)
         board.users.add(user)
-
-    return render(request, 'notices/view_board.html', {'board': board})
+        return redirect('view_board', pk=board.pk)
+    return redirect('view_board', pk=board.pk)
 
 @login_required
-def turn_public(request, pk):
+@require_ownership
+def turn_public(request, board):
     """Turns a private board into a public one."""
-    board = get_object_or_404(Board, pk=pk)
-
     if request.method == 'POST':
         if request.POST.get('verification') == 'public':
             board.is_private = False
             board.save()
-
-    return render(request, 'notices/view_board.html', {'board': board})
+        return redirect('view_board', pk=board.pk)
+    return redirect('view_board', pk=board.pk)
 
 @login_required
-def turn_private(request, pk):
+@require_ownership
+def turn_private(request, board):
     """Turns a public board into a private one."""
-    board = get_object_or_404(Board, pk=pk)
-
     if request.method == 'POST':
         if request.POST.get('verification') == 'private':
             board.is_private = True
             board.save()
-
-    return render(request, 'notices/view_board.html', {'board': board})
+        return redirect('view_board', pk=board.pk)
+    return redirect('view_board', pk=board.pk)
