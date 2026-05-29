@@ -14,16 +14,24 @@ def require_ownership(view_func):
         return view_func(request, board, *args, **kwargs)
     return wrapper
 
+# FLAW 2 FIX: correctly checks that the user is authorized to perform that function.
+# def require_authorization(view_func):
+#     """Only allow whitelisted users to access the view."""
+#     @wraps(view_func)
+#     def wrapper(request, pk, *args, **kwargs):
+#         board = get_object_or_404(Board, pk=pk)
+#         if board.owner == request.user:
+#             return view_func(request, board, *args, **kwargs)
+#         if not board.is_private:
+#             return view_func(request, board, *args, **kwargs)
+#         if request.user in board.users.all():
+#             return view_func(request, board, *args, **kwargs)
+#         return redirect('home')
+#     return wrapper
+
 def require_authorization(view_func):
-    """Only allow whitelisted users to access the view."""
     @wraps(view_func)
     def wrapper(request, pk, *args, **kwargs):
         board = get_object_or_404(Board, pk=pk)
-        if board.owner == request.user:
-            return view_func(request, board, *args, **kwargs)
-        if not board.is_private:
-            return view_func(request, board, *args, **kwargs)
-        if request.user in board.users.all():
-            return view_func(request, board, *args, **kwargs)
-        return redirect('home')
+        return view_func(request, board, *args, **kwargs)
     return wrapper

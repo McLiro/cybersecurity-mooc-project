@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login as auth_login
 from django.db.models import Q
+from django.views.decorators.csrf import csrf_exempt
 from .models import Board
 from .forms import BoardForm, NoticeForm
 from .decorators import require_authorization, require_ownership
@@ -75,6 +76,8 @@ def create_notice(request, board):
 
 @login_required
 @require_ownership
+# FLAW 1 FIX: remove @csrf_exempt
+@csrf_exempt
 def whitelist_user(request, board):
     """Handles the whitelisting of new users."""
     if request.method == 'POST':

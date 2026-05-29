@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
     <body>
+        <h1>{{ board.name | safe }}</h1>
+
+        <!-- FLAW 4 FIX: remove |safe to let Django auto‑escape
         <h1>{{ board.name }}</h1>
+        -->
+
         {% if board.is_private and board.owner == user %}
             <p>This board is private. Whitelist a new user?</p>
             <p>Enter username: (case sensitive)</p>
